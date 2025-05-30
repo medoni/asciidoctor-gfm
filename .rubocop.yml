@@ -1,0 +1,17 @@
+# RuboCop configuration file to ignore specific Metrics offenses for converter.rb
+
+Metrics/ClassLength:
+  Exclude:
+    - 'lib/asciidoctor/gfm/converter.rb'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'lib/asciidoctor/gfm/converter.rb'
+
+Metrics/AbcSize:
+  Exclude:
+    - 'lib/asciidoctor/gfm/converter.rb'
+
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - 'lib/asciidoctor/gfm/converter.rb'

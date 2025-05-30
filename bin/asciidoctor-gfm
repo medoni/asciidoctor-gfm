@@ -1,0 +1,88 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'asciidoctor'
+require 'asciidoctor-diagram'
+require 'optparse'
+require_relative '../lib/asciidoctor_gfm'
+
+options = {
+  output: nil,
+  attributes: {},
+  diagram: true # Enable diagram processing by default
+}
+
+parser = OptionParser.new do |opts|
+  opts.banner = 'Usage: asciidoctor-gfm [options] FILE'
+
+  opts.on('-o', '--output FILE', 'Output file (default: FILE with .md extension)') do |file|
+    options[:output] = file
+  end
+
+  opts.on('-a', '--attribute KEY[=VALUE]', 'Document attribute to set') do |attr|
+    key, value = attr.split('=', 2)
+    options[:attributes][key] = value || ''
+  end
+
+  opts.on('--[no-]diagrams', 'Enable or disable diagram processing (default: enabled)') do |v|
+    options[:diagram] = v
+  end
+
+  opts.on('-h', '--help', 'Display this help message') do
+    puts opts
+    exit
+  end
+
+  opts.on('-v', '--version', 'Display version information') do
+    require_relative '../lib/asciidoctor/gfm/version'
+    puts "asciidoctor-gfm #{Asciidoctor::GFM::VERSION}"
+    exit
+  end
+end
+
+begin
+  parser.parse!
+
+  if ARGV.empty?
+    puts 'Error: No input file specified.'
+    puts parser
+    exit 1
+  end
+
+  input_file = ARGV[0]
+  output_file = options[:output] || input_file.sub(/\.\w+$/, '.md')
+
+  # Prepare conversion options
+  conversion_opts = {
+    backend: 'gfm',
+    safe: :safe,
+    to_file: output_file,
+    attributes: options[:attributes]
+  }
+
+  # Add diagram requirements if enabled
+  if options[:diagram]
+    # Create assets directory for diagrams
+    assets_dir = File.dirname(output_file)
+    Dir.mkdir(assets_dir) unless File.directory?(assets_dir)
+
+    # Set diagram attributes
+    conversion_opts[:attributes]['diagram-cachedir'] = "#{assets_dir}/.asciidoctor/diagram"
+
+    # Make sure we require the extension
+    require 'asciidoctor-diagram'
+  end
+
+  Asciidoctor.convert_file(input_file, **conversion_opts)
+
+  puts "Converted #{input_file} to #{output_file}"
+# rubocop:disable Style/RescueStandardError
+rescue OptionParser::InvalidOption => e
+  puts "Error: #{e.message}"
+  puts parser
+  exit 1
+rescue => e
+  puts "Error: #{e.message}"
+  exit 1
+end
+# rubocop:enable Style/RescueStandardError

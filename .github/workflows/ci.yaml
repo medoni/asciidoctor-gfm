@@ -1,0 +1,144 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  extract-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from version.rb
+        id: get-version
+        run: |
+          VERSION=$(ruby -e "require './lib/asciidoctor/gfm/version.rb'; puts Asciidoctor::GFM::VERSION")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
+
+  lint-ruby:
+    runs-on: ubuntu-latest
+    needs: extract-version
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Install RuboCop
+        run: gem install rubocop
+
+      - name: Run RuboCop
+        run: rubocop --parallel
+
+  build-gem:
+    runs-on: ubuntu-latest
+    needs: extract-version
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+
+      - name: Install dependencies
+        run: bundle install --jobs 4 --retry 3      
+
+      - name: Check for common gem issues
+        run: |
+          bundle exec rake spec:sanity || echo "No sanity specs defined"
+          gem build asciidoctor-gfm.gemspec --strict
+
+      - name: Build gem
+        run: gem build asciidoctor-gfm.gemspec
+      
+      - name: Validate gemspec
+        run: gem specification asciidoctor-gfm-${{ needs.extract-version.outputs.version }}.gem
+
+      - name: Upload gem artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: asciidoctor-gfm-gem-${{ needs.extract-version.outputs.version }}
+          path: '*.gem'
+
+  docker:
+    name: Build and Test Docker Image
+    needs: [build-gem, extract-version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ghcr.io/${{ github.repository }}/asciidoctor-gfm
+      VERSION: ${{ needs.extract-version.outputs.version }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            --build-arg VERSION=${{ needs.extract-version.outputs.version }} \
+            -t ${{ env.IMAGE_NAME }}:latest \
+            -t ${{ env.IMAGE_NAME }}:${{ env.VERSION }} \
+            .
+      
+      - name: Run Docker integration test
+        run: |
+          docker run --rm -v "$PWD:/documents" ${{ env.IMAGE_NAME }}:latest examples/plantuml.adoc
+      
+      - name: Verify generated markdown file
+        run: |
+          if [ ! -f examples/plantuml.md ]; then
+            echo "Markdown file was not created!" >&2
+            exit 1
+          fi
+
+          if ! grep -q "!\[basic sequence diagram\](basic-sequence-diagram.png)" examples/plantuml.md; then
+            echo "Markdown file missing basic sequence diagram reference" >&2
+            exit 1
+          fi
+
+          if ! grep -q "!\[class diagram\](class-diagram.png)" examples/plantuml.md; then
+            echo "Markdown file missing class diagram reference" >&2
+            exit 1
+          fi
+
+          if [ ! -f examples/basic-sequence-diagram.png ]; then
+            echo "Basic sequence diagram image not found" >&2
+            exit 1
+          fi
+
+          if [ ! -f examples/class-diagram.png ]; then
+            echo "Class diagram image not found" >&2
+            exit 1
+          fi
+
+      - name: Push Docker images
+        if: github.event_name != 'pull_request'
+        run: |
+          docker push ${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.IMAGE_NAME }}:${{ env.VERSION }}

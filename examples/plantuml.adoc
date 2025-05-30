@@ -1,0 +1,33 @@
+= PlantUML Example
+:source-highlighter: rouge
+:imagesdir: ./
+
+== Basic Sequence Diagram
+
+[plantuml, "basic-sequence-diagram", format=png]
+....
+@startuml
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another request
+Alice <-- Bob: Another response
+@enduml
+....
+
+== Class Diagram
+
+[plantuml, "class-diagram", format=png]
+....
+@startuml
+class Car {
+  +Color color
+  +int weight
+  +start()
+  +stop()
+}
+
+Driver - Car : drives >
+Car *- Wheel : has 4 >
+@enduml
+....
