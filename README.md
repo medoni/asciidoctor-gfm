@@ -1,5 +1,9 @@
 # Asciidoctor-GFM
 
+![GitHub License](https://img.shields.io/github/license/medoni/asciidoctor-gfm)
+[![CI/CD](https://github.com/medoni/asciidoctor-gfm/actions/workflows/ci.yaml/badge.svg)](https://github.com/medoni/asciidoctor-gfm/actions/workflows/ci.yaml)
+![Version](https://ghcr-badge.egpl.dev/medoni/asciidoctor-gfm/asciidoctor-gfm/tags?label=version)
+
 An Asciidoctor extension that converts AsciiDoc to GitHub Flavored Markdown (GFM).
 
 ## Installation
@@ -9,7 +13,6 @@ An Asciidoctor extension that converts AsciiDoc to GitHub Flavored Markdown (GFM
 ```bash
 $ gem install asciidoctor-gfm
 ```
-
 
 ## Usage Examples
 
@@ -64,7 +67,7 @@ $ docker run --rm -v "$PWD:/documents" ghcr.io/medoni/asciidoctor-gfm/asciidocto
 ```
 
 The complete usage:
-```bash 
+```bash
 $ docker run --rm -v ghcr.io/medoni/asciidoctor-gfm/asciidoctor-gfm:latest
 # Usage: asciidoctor-gfm [options] FILE
 #     -o, --output FILE                Output file (default: FILE with .md extension)
