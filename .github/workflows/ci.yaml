@@ -108,8 +108,8 @@ jobs:
 
       - name: Run Docker integration test
         run: |
-          chmod +x ./test/integration/test.sh
-          ./test/integration/test.sh
+          chmod +x ./tests/integration-tests/test-examples.sh
+          ./tests/integration-tests/test-examples.sh
 
       - name: Push Docker images
         if: github.event_name != 'pull_request'
