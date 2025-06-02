@@ -1,5 +1,9 @@
 # Asciidoctor-GFM
 
+[![GitHub License](https://img.shields.io/github/license/medoni/asciidoctor-gfm)](https://github.com/medoni/asciidoctor-gfm/blob/main/LICENSE)
+[![CI/CD](https://github.com/medoni/asciidoctor-gfm/actions/workflows/ci.yaml/badge.svg)](https://github.com/medoni/asciidoctor-gfm/actions/workflows/ci.yaml)
+[![Version](https://ghcr-badge.egpl.dev/medoni/asciidoctor-gfm/asciidoctor-gfm/tags?label=version)](https://github.com/medoni/asciidoctor-gfm/pkgs/container/asciidoctor-gfm%2Fasciidoctor-gfm)
+
 An Asciidoctor extension that converts AsciiDoc to GitHub Flavored Markdown (GFM).
 
 ## Installation
@@ -9,7 +13,6 @@ An Asciidoctor extension that converts AsciiDoc to GitHub Flavored Markdown (GFM
 ```bash
 $ gem install asciidoctor-gfm
 ```
-
 
 ## Usage Examples
 
@@ -64,7 +67,7 @@ $ docker run --rm -v "$PWD:/documents" ghcr.io/medoni/asciidoctor-gfm/asciidocto
 ```
 
 The complete usage:
-```bash 
+```bash
 $ docker run --rm -v ghcr.io/medoni/asciidoctor-gfm/asciidoctor-gfm:latest
 # Usage: asciidoctor-gfm [options] FILE
 #     -o, --output FILE                Output file (default: FILE with .md extension)
@@ -89,7 +92,7 @@ The following AsciiDoc and GitHub Flavored Markdown (GFM) features are supported
 | Literal Blocks          | ``` ... ```               | No language |
 | Admonitions             | **NOTE:**, **TIP:**, etc. | Rendered as bold label |
 | Tables                  | Markdown tables           | Header, separator, body |
-| Images                  | ![alt](path "title")     | Respects :imagesdir: |
+| Images                  | `![alt](path "title")`    | Respects :imagesdir: |
 | Inline Formatting       | **bold**, *italic*, `code`, <sup>sup</sup>, <sub>sub</sub>, <mark>mark</mark> | |
 | Links                   | [text](url)               | Xrefs as [text](#anchor) |
 | PlantUML Diagrams       | Image references          | With asciidoctor-diagram |
