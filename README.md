@@ -1,8 +1,8 @@
 # Asciidoctor-GFM
 
-![GitHub License](https://img.shields.io/github/license/medoni/asciidoctor-gfm)
+[![GitHub License](https://img.shields.io/github/license/medoni/asciidoctor-gfm)](https://github.com/medoni/asciidoctor-gfm/blob/main/LICENSE)
 [![CI/CD](https://github.com/medoni/asciidoctor-gfm/actions/workflows/ci.yaml/badge.svg)](https://github.com/medoni/asciidoctor-gfm/actions/workflows/ci.yaml)
-![Version](https://ghcr-badge.egpl.dev/medoni/asciidoctor-gfm/asciidoctor-gfm/tags?label=version)
+[![Version](https://ghcr-badge.egpl.dev/medoni/asciidoctor-gfm/asciidoctor-gfm/tags?label=version)](https://github.com/medoni/asciidoctor-gfm/pkgs/container/asciidoctor-gfm%2Fasciidoctor-gfm)
 
 An Asciidoctor extension that converts AsciiDoc to GitHub Flavored Markdown (GFM).
 
@@ -92,7 +92,7 @@ The following AsciiDoc and GitHub Flavored Markdown (GFM) features are supported
 | Literal Blocks          | ``` ... ```               | No language |
 | Admonitions             | **NOTE:**, **TIP:**, etc. | Rendered as bold label |
 | Tables                  | Markdown tables           | Header, separator, body |
-| Images                  | ![alt](path "title")     | Respects :imagesdir: |
+| Images                  | `![alt](path "title")`    | Respects :imagesdir: |
 | Inline Formatting       | **bold**, *italic*, `code`, <sup>sup</sup>, <sub>sub</sub>, <mark>mark</mark> | |
 | Links                   | [text](url)               | Xrefs as [text](#anchor) |
 | PlantUML Diagrams       | Image references          | With asciidoctor-diagram |
