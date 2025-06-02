@@ -56,7 +56,7 @@ jobs:
           ruby-version: '3.2'
 
       - name: Install dependencies
-        run: bundle install --jobs 4 --retry 3      
+        run: bundle install --jobs 4 --retry 3
 
       - name: Check for common gem issues
         run: |
@@ -65,7 +65,7 @@ jobs:
 
       - name: Build gem
         run: gem build asciidoctor-gfm.gemspec
-      
+
       - name: Validate gemspec
         run: gem specification asciidoctor-gfm-${{ needs.extract-version.outputs.version }}.gem
 
@@ -105,37 +105,11 @@ jobs:
             -t ${{ env.IMAGE_NAME }}:latest \
             -t ${{ env.IMAGE_NAME }}:${{ env.VERSION }} \
             .
-      
+
       - name: Run Docker integration test
         run: |
-          docker run --rm -v "$PWD:/documents" ${{ env.IMAGE_NAME }}:latest examples/plantuml.adoc
-      
-      - name: Verify generated markdown file
-        run: |
-          if [ ! -f examples/plantuml.md ]; then
-            echo "Markdown file was not created!" >&2
-            exit 1
-          fi
-
-          if ! grep -q "!\[basic sequence diagram\](basic-sequence-diagram.png)" examples/plantuml.md; then
-            echo "Markdown file missing basic sequence diagram reference" >&2
-            exit 1
-          fi
-
-          if ! grep -q "!\[class diagram\](class-diagram.png)" examples/plantuml.md; then
-            echo "Markdown file missing class diagram reference" >&2
-            exit 1
-          fi
-
-          if [ ! -f examples/basic-sequence-diagram.png ]; then
-            echo "Basic sequence diagram image not found" >&2
-            exit 1
-          fi
-
-          if [ ! -f examples/class-diagram.png ]; then
-            echo "Class diagram image not found" >&2
-            exit 1
-          fi
+          chmod +x ./test/integration/test.sh
+          ./test/integration/test.sh
 
       - name: Push Docker images
         if: github.event_name != 'pull_request'
