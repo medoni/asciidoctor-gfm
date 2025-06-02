@@ -7,14 +7,14 @@
 #
 # This script runs integration tests using the specified Docker image.
 
-IMAGE_NAME=${1:-asciidoctor-gfm/asciidoctor-gfm}
+IMAGE_NAME=${1:-asciidoctor-gfm/asciidoctor-gfm:latest}
 SCRIPT_DIR="$(dirname -- "$0")"
 EXAMPLES_DIR="$(realpath $SCRIPT_DIR/../../examples)"
 
 echo $EXAMPLES_DIR
 
 test_examples_plantuml() {
-  docker run --rm -v "$EXAMPLES_DIR:/documents" "$IMAGE_NAME:latest" /documents/plantuml.adoc
+  docker run --rm -v "$EXAMPLES_DIR:/documents" "$IMAGE_NAME" /documents/plantuml.adoc
 
   if [ ! -f "$EXAMPLES_DIR/plantuml.md" ]; then
     echo "Markdown file was not created!" >&2
